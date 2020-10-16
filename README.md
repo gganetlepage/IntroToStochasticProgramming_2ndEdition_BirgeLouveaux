@@ -10,4 +10,4 @@ The farming example introduces a farm where some elements are uncertain:
 - the buying and selling price of these elements at the marketplace
 Analysis of robustness and performance is exposed and the notion of several stages where to make decisions.
 
-The newspaper example is a simpler example of a recourse situation.
+The newspaper example is a simpler example with a recourse situation.

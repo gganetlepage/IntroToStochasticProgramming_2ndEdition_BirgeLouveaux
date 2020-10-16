@@ -104,11 +104,6 @@ function model_with_first_stage_given(x, sell, buy, yield, plant, print_model = 
     solve_model(model, print_result)
 end
 
-println("END ______________________________________________________________________________________")
-
-#obj_value, w, y = model_with_first_stage_given([120, 80, 300], sell_mean, buy_mean, yield_mean, plant, true)
-#println("obj_value: ", obj_value,"\n w: ", w, "\n y: ", y)
-
 function solve_multiple_models_with_first_stage_given(land, cattle, sell_mean, sell_var, buy_mean, buy_var, yield_mean, yield_var, quota, plant, print_models = false, print_results = false)
     sell_min = sell_mean * (1 - sell_var)
     sell_max = sell_mean * (1 + sell_var)
