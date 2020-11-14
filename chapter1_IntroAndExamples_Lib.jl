@@ -1,5 +1,5 @@
 #the same notation as in the book is used in order to compare promptly
-using JuMP, Gurobi
+using JuMP, StochasticPrograms, Gurobi
 
 const GUROBI_ENV = Gurobi.Env() # This constant able not to see more than once "Academic license - for non-commercial use only"
 
@@ -116,7 +116,83 @@ function solve_multiple_models_with_first_stage_given(land, cattle, sell_mean, s
     model_with_first_stage_given(land, cattle, sell_max, buy_max, yield_max, quota, plant, print_models, print_results)
 end
 
-#page 13
+"Return the minimal value(s), mean value(s) and the max value(s) due to the uncertainty"
+rangeValues(mean, variation::Number) = mean*(1 - variation), mean, mean*(1 + variation)
+
+
+
+"Build the stochastic farm model"
+function build_farm_model(land, cattle, sell_mean, sell_var, buy_mean, buy_var, yield_mean, yield_var, quota, plant, print_models = false, print_results = false)
+    sell_min, sell_mean, sell_max = rangeValues(sell_mean, sell_var)
+    buy_min, buy_mean, buy_max = rangeValues(buy_mean, buy_var)
+    yield_min, yield_mean, yield_max = rangeValues(yield_mean, yield_var)
+    farmer_model = @stochastic_model begin
+        @stage 1 begin
+            
+        end
+        @stage 2 begin
+            
+        end
+    end
+end
+
+#quickstart of StochasticPrograms
+quickstart_model = @stochastic_model begin
+    @stage 1 begin
+        @decision(model, x₁ >= 40)
+        @decision(model, x₂ >= 20)
+        @objective(model, Min, 100*x₁ + 150*x₂)
+        @constraint(model, x₁ + x₂ <= 120)
+    end
+    @stage 2 begin
+        @uncertain q₁ q₂ d₁ d₂
+        @variables(model, begin
+            0 <= y₁ <= d₁
+            0 <= y₂ <= d₂
+        end)
+        @objective(model, Max, q₁ * y₁ + q₂ * y₂)
+        @constraints(model, begin
+            6*y₁ + 10*y₂ <= 60*x₁
+            8*y₁ + 5*y₂ <= 80*x₂
+         end)
+    end
+    
+end
+
+
+#farm problem
+farm_stochastic_model = @stochastic_model begin
+    @stage 1 begin
+        @parameters begin
+            crop = [:wheat, :corn, :beets]
+            plant = Dict(:wheat => 150, :corn => 230, :beets => 260)
+            land = 500
+        end
+        @decision(model, x[c in crop] >= 0)
+        @objective(model, Min, sum(plant[c]*x[c] for c in crop))
+        @constraint(model, sizeLand, sum(x[c] for c in crop) <= land)
+    end
+    @stage 2 begin
+        @parameters begin
+            crop = [:wheat, :corn, :beets]
+            sell = Dict(:wheat => 170, :corn => 150, :beets => 36, :extra_beets => 10)
+            buy = Dict(:wheat => 238, :corn => 210)
+            requirement = Dict(:wheat => 200, :corn => 240, :beets => 0)
+        end
+        @uncertain ξ[c in crop]
+        @variables(model, begin
+            y[b in setdiff(crop, [:beets])] >= 0
+            w[s in crop ∪ [:extra_beets]] >= 0
+        end)
+        @objective(model, Min, sum(buy[b]*y[b] for b in setdiff(crop, [:beets])) - sum(sell[s]*w[s] for s in crop ∪ [:extra_beets]))
+        @constraint(model, minimum_requirement[b in setdiff(crop, [:beets])], ξ[b]*x[b] + y[b] - w[b] >= requirement[b])
+        @constraint(model, minimum_requirement_beets, ξ[:beets]*x[:beets] - w[:beets] - w[:extra_beets]>= requirement[:beets])
+        @constraint(model, good_price_cap, w[:beets] <= 6000)
+    end
+end
+
+
+#page13
 
 function recourse3(x)
     if x <= 250
