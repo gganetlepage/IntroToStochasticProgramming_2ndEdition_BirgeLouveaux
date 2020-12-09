@@ -1,4 +1,4 @@
-include("chapter1_IntroAndExamples_Lib.jl")
+include("1_1_lib.jl")
 
 #Parameters
 land = 500
@@ -105,5 +105,6 @@ optimize!(farmInstance)
 println("wheat: $(x[1])\n corn: $(x[2])\n beets: $(x[3])\n")
 
 println("\n\n3. BINARY FIRST STAGE\n")
+
 
 

@@ -1,11 +1,10 @@
 #the same notation as in the book is used in order to compare promptly
-using JuMP, StochasticPrograms, Gurobi
+using JuMP, StochasticPrograms, GLPK
 
-const GUROBI_ENV = Gurobi.Env() # This constant able not to see more than once "Academic license - for non-commercial use only"
 
 "Add a new model, create the variables with their domain, the objective and the constraints"
 function build_and_solve_model(land, cattle, sell, buy, yield, quota, plant, print_model = false, print_result = false)
-    model = Model(with_optimizer(Gurobi.Optimizer,GUROBI_ENV)) # GUROBI_ENV to hide the gurobi message
+    model = Model(with_optimizer(GLPK.Optimizer))
     function add_variables(model)
         @variables(model, begin
         x[i=1:3] >= 0, (base_name = "x_$i") # acres devoted to a resource to produce
@@ -62,7 +61,7 @@ function solve_multiple_models(land, cattle, sell_mean, sell_var, buy_mean, buy_
 end
 
 function model_with_first_stage_given(x, sell, buy, yield, plant, print_model = false, print_result = false)
-    model = Model(with_optimizer(Gurobi.Optimizer,GUROBI_ENV)) # GUROBI_ENV to hide the gurobi message
+    model = Model(with_optimizer(GLPK.Optimizer))
     function add_variables(model)
         @variables(model, begin
         w[j=1:4] >= 0, (base_name = "w_$j") # tons of resources sold
@@ -191,36 +190,18 @@ farm_stochastic_model = @stochastic_model begin
     end
 end
 
+# Binary first stage
 
-#page13
-
-function recourse3(x)
-    if x <= 250
-        return - 36*20*x
-    elseif x >= 375
-        return -156000 - 10*20*x
-    else
-        return -36*20*x + 13*(24*x - 6000)^2 / (8*x)
+function binary_first_stage(fields, plants, land)
+    binary_model = @stochastic_model begin
+        @stage 1 begin
+            @parameters begin
+                crop = [:wheat, :corn, :beets]
+                plant = Dict(:wheat=>plants[1], :corn=>plants[2], :beets=>plants[3])
+                #land
+            end
+            @decision(model, x[i in fields][j in crop], Bin)
+            @objective(model, Min, sum( for j in crop)) #TODO complete the objective
+        end
+        #TODO add stage 2
     end
-end
-
-function recourse2(x)
-    if x <= 200/3
-        return 50400 - 630*x
-    elseif x >= 100
-        return 36000 - 450*x
-    else
-        87.5*(240 - 2.4*x)^2 / x - 62.5*(240 - 3.6 * x)^2 / x
-    end
-end
-
-function recourse1(x)
-    if x <= 200/3
-        return 47600 - 595*x
-    elseif x >= 100
-        return 34000 - 425*x
-    else
-        119*(200 - 2*x)^2 / x - 85*(200 - 3 * x)^2 / x
-    end
-end
-

@@ -1,4 +1,4 @@
-include("C:/Personnel/Programmation/Julia/IntroToStochasticProgramming_2ndEdition_BirgeLouveaux/JuMPTutorialsExercises.jl")
+include("JuMP_tutorial_lib.jl")
 
 #Sudoku
 model = build_model()
