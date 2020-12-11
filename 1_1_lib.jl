@@ -191,7 +191,7 @@ farm_stochastic_model = @stochastic_model begin
 end
 
 # Binary first stage
-
+#=
 function binary_first_stage(fields, plants, land)
     binary_model = @stochastic_model begin
         @stage 1 begin
@@ -205,3 +205,4 @@ function binary_first_stage(fields, plants, land)
         end
         #TODO add stage 2
     end
+=#

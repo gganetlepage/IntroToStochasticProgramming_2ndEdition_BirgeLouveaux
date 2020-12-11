@@ -87,7 +87,7 @@ y: [0.0, 180.0]
 #Quickstart example
 ξ₁ = Scenario(q₁ = 24.0, q₂ = 28.0, d₁ = 500.0, d₂ = 100.0, probability = 0.4)
 ξ₂ = Scenario(q₁ = 28.0, q₂ = 32.0, d₁ = 300.0, d₂ = 300.0, probability = 0.6)
-sp = instantiate(quickstart_model, [ξ₁,ξ₂], optimizer = Gurobi.Optimizer)
+sp = instantiate(quickstart_model, [ξ₁,ξ₂], optimizer = GLPK.Optimizer)
 #optimize!(sp)
 #println(objective_value(sp))
 #println(optimal_decision(sp))
@@ -98,12 +98,17 @@ yield_min, yield_mean, yield_max = rangeValues(yield_mean, yield_var)
 ξ₁ = Scenario( wheat = yield_min[1], corn = yield_min[2], beets = yield_min[3], probability = 1/3)
 ξ₂ = Scenario( wheat = yield_mean[1], corn = yield_mean[2], beets = yield_mean[3], probability = 1/3)
 ξ₃ = Scenario( wheat = yield_max[1], corn = yield_max[2], beets = yield_max[3], probability = 1/3)
-farmInstance = instantiate(farm_stochastic_model, [ξ₁,ξ₂,ξ₃], optimizer = Gurobi.Optimizer)
+farmInstance = instantiate(farm_stochastic_model, [ξ₁,ξ₂,ξ₃], optimizer = GLPK.Optimizer)
 
 #print(farmInstance)
 optimize!(farmInstance)
 println("wheat: $(x[1])\n corn: $(x[2])\n beets: $(x[3])\n")
-
+#=
+wheat: 100.0
+ corn: 24.999999999999986
+ beets: 375.0
+ =#
+ 
 println("\n\n3. BINARY FIRST STAGE\n")
 
 
