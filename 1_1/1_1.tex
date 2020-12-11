@@ -1,20 +1,14 @@
-\documentclass{article}
+\documentclass[12pt]{article}
 
 % Packages
 \usepackage{comment}
 \usepackage{amsmath} % Advanced math typesetting
+\usepackage{amsfonts}
 \usepackage[utf8]{inputenc} % Unicode support (Umlauts etc.)
 \usepackage{hyperref} % Add a link to your document
 \usepackage[monochrome]{color} % Turning all of the colors stiched off
 
 \begin{document}
-
-\begin{align}
-f(x) &= x^2\\
-f'(x) &= 2x\\
-F(x) &= \int f(x)dx\\
-F(x) &= \frac{1}{3}x^3
-\end{align}
 
 \section{Introduction and Examples}
 
@@ -37,22 +31,82 @@ cf. 1\_1.jl
 	\item $buy_j$: unit price of buying product $j$
 	\item $sell_j$: unit price of selling product $j$
 	\item $cattle_j$: amount of product $j$ to keep for the cattle
-	\item $yield_j$: yield of product $j$ for an unit of a field 
+	\item $yield_j$: yield of product $j$ for an unit of a field
+	\item $capBeet$: max quantity of beet to be sold at a favorable price
 \end{itemize}
 
 \paragraph{Decision}
 \begin{itemize}
-	\item $y_j$= quantity of product $j=1...P-1$ bought
-	\item $w_j$= quantity of product $j=1...P+1$  sold, the last being the sugar beets sold at a lower price
+	\item $y_j$= "amount of product $j$ bought", $\forall j = 1...|P|-1$\\ sugar beets can't be bought on the market
+	\item $w_j$= "amount of product $j$  sold", $\forall j = 1...|P|+1$\\ the last one being the sugar beets sold at a lower price
 	\item $x_{ij}= \left\{
 	\begin{array}{ll}
-	1 & \text{if field $i$ is planted with product $j$ }\\
+	1 & \text{"if field $i$ is planted with product $j$" }\\
 	0 & \text{else}
-	\end{array}
+	\end{array}, \forall i = 1...|F|,\; \forall j = 1...|P|
 	 \right.$
 \end{itemize}
 
 \paragraph{Mathematical model}
+\begin{align}
+	\text{min} & \sum\limits_{j=1}^{|P|} \sum\limits_{i=1}^{|F|} plant_j \cdot field_i \cdot x_{ij} + \mathcal{Q}(x)
+\end{align}
+where x = ($x_{ij}$)$_{i = 1...|F|,j = 1...|P|}$
 
+s.t.:
+\begin{align}
+\sum\limits_{j=1}^{|P|} x_{ij}\leq 1 & &\forall i=1...|F| \\
+x_{ij} \in \{0,1\} & & \forall i=1...|F|, \forall j=1...|P|
+\end{align}
+with the recourse function $\mathcal{Q}$ defined as:
+\begin{equation}
+\mathcal{Q} = \sum\limits_{j=1}^{|P|-1} buy_j \cdot y_j - \sum\limits_{j=1}^{|P|+1} sell_j \cdot w_j
+\end{equation}
+s.t.\\
+\begin{align}
+y_j - w_j \geq cattle_j - yield_j \cdot (\sum\limits_{i=1}^{|F|} field_i \cdot x_{ij})&  & \forall j=1...|P|-1\\
+- w_j- w_{j+1} \geq cattle_j - yield_j \cdot (\sum\limits_{i=1}^{|F|} field_i \cdot x_{ij}) & & j=|P|\\
+w_{j} \leq capBeet & & j=|P|\\
+w_j \geq 0 & & \forall j=1...|P|+1\\
+y_j \geq 0 & & \forall j=1...|P|-1
+\end{align}
+
+\subsection{Integer second stage}
+\setcounter{equation}{0}
+\paragraph{Parameter}
+\begin{itemize}
+	\item $order$: order of magnitude of a contract, numerically here $order$=100
+	\item $field$: total size of the field
+\end{itemize}
+\paragraph{Decision}
+$x_j$= "amount of field used to produce product $j$", $\forall j=1...|P|$
+\paragraph{Model}
+\begin{align}
+	\text{min} & \sum\limits_{j=1}^{|P|} plant_j \cdot x_j + \mathcal{Q}(x)
+\end{align}
+where x = ($x_j$)$_{j = 1...|P|}$
+
+s.t.:
+\begin{align}
+\sum\limits_{j=1}^{|P|} x_j\leq field & & \\
+x_j \geq 0 & & \forall j=1...|P|
+\end{align}
+with the recourse function $\mathcal{Q}$ defined as:\\
+\begin{equation}
+\mathcal{Q} = \sum\limits_{j=1}^{|P|-1} buy_j \cdot y_j - \sum\limits_{j=1}^{|P|+1} sell_j \cdot w_j
+\end{equation}
+s.t.\\
+\begin{align}
+order \cdot (y_j - w_j) \geq cattle_j - yield_j \cdot x_j &  & \forall j=1...|P|-1\\
+- order \cdot (w_j + w_{j+1}) \geq cattle_j - yield_j \cdot x_j & & j=|P|\\
+order \cdot w_{j} \leq capBeet & & j=|P|\\
+w_j \in \mathbb{N} & & \forall j=1...|P|+1\\
+y_j \in \mathbb{N} & & \forall j=1...|P|-1
+\end{align}
+
+\subsection{Computation}
+cf. 1\_1.jl
+
+\subsubsection{Multistage program}
 
 \end{document}
