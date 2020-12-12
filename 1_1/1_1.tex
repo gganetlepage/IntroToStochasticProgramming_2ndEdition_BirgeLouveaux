@@ -107,6 +107,93 @@ y_j \in \mathbb{N} & & \forall j=1...|P|-1
 \subsection{Computation}
 cf. 1\_1.jl
 
-\subsubsection{Multistage program}
+\subsection{Multistage program}
+\setcounter{equation}{0}
+3-stage problem :
+\begin{itemize}
+	\item 1st stage is planting products
+	\item 2nd stage is buying, selling grown products and planting for the next year
+	\item 3rd stage is selling grown products of year 2 and buying
+\end{itemize}
+
+\paragraph{Set and Parameter}
+\begin{itemize}
+	\item $H$: time horizon
+	\item $T$: time scale, index $t$, $T = {1,...,H}$
+\end{itemize}
+here H=2
+\paragraph{Decision}
+\begin{itemize}
+	\item $x_i^t$ = "amount of field planted with product $i$ at time $t$", $\forall i \in P, \forall t=1,...,H$
+	\item $y_j^t$= "amount of product $j$ bought at time $t$", $\forall j = 1...|P|-1, \forall t=1,...,H$\\ sugar beets can't be bought on the market
+	\item $w_j^t$= "amount of product $j$  sold  at time $t$", $\forall j = 1...|P|+1, \forall t=1,...,H$\\ the last one being the sugar beets sold at a lower price
+\end{itemize}
+
+\paragraph{Model}
+\begin{align}
+	\text{min} & \sum\limits_{j=1}^{|P|} plant_j \cdot x^1_j + \mathcal{Q}_1(x^1)
+\end{align}
+where $x^1 = (x_j^1)_{j = 1...|P|}$
+s.t.:
+\begin{align}
+\sum\limits_{j=1}^{|P|} x_j^1 \leq field & & \\
+x_j^1 \geq 0 & & \forall j=1...|P|
+\end{align}
+%Q1
+with the recourse function $\mathcal{Q}_1$ defined as:\\
+\begin{equation}
+\mathcal{Q}_1 = \mathrm{E}_{\xi^1} \mathrm{Q}_1(x^1,\xi^1)
+\end{equation}
+and
+\begin{equation}
+\mathrm{Q}_1(x^1,\xi^1) = \sum\limits_{j=1}^{|P|-1} buy_j \cdot y_j^1 - \sum\limits_{j=1}^{|P|+1} sell_j \cdot w_j^1 + \sum\limits_{j=1}^{|P|} plant_j \cdot x^2_j  + \mathcal{Q}_2(x^2)
+\end{equation}
+s.t.:
+\begin{align}
+\sum\limits_{j=1}^{|P|} x_j^2 \leq field & & \\
+x_{|P|}^2 \leq field - x_{|P|}^1\\
+y_j^1 - w_j^1 \geq cattle_j - yield_j \cdot x_j^1 &  & \forall j=1...|P|-1\\
+- w_{|P|}^1- w_{|P|+1}^1 \geq cattle_{|P|} - yield_{|P|} \cdot x_{|P|}^1 & & \\
+w_{|P|}^1 \leq capBeet & & \\
+w_j^1 \geq 0 & & \forall j=1...|P|+1\\
+y_j^1 \geq 0 & & \forall j=1...|P|-1\\
+x_j^2 \geq 0 & & \forall j=1...|P|
+\end{align}
+\begin{align}
+\end{align}
+%Q2
+\begin{equation}
+\mathcal{Q}_2 = \mathrm{E}_{\xi^2} \mathrm{Q}_2(x^2,\xi^2)
+\end{equation}
+and
+\begin{equation}
+\mathrm{Q}_2(x^2,\xi^2) = \sum\limits_{j=1}^{|P|-1} buy_j \cdot y_j^2 - \sum\limits_{j=1}^{|P|+1} sell_j \cdot w_j^2
+\end{equation}
+s.t.
+\begin{align}
+y_j^2 - w_j^2 \geq cattle_j - yield_j \cdot x_j^2 &  & \forall j=1...|P|-1\\
+- w_{|P|}^2- w_{|P|+1}^2 \geq cattle_{|P|} - yield_{|P|} \cdot x_{|P|}^2 & & \\
+w_{|P|}^2 \leq capBeet & & \\
+w_j^2 \geq 0 & & \forall j=1...|P|+1\\
+y_j^2 \geq 0 & & \forall j=1...|P|-1
+\end{align}
+Equation 7 links the sugar beets planting quantity between the 2 years.\\
+Using the 2 recourse functions $\mathcal{Q}_1$ and $\mathcal{Q}_2$, decisions are taken while knowing what was the result of the previous steps.\\\\
+If there is uncertainty on the yield, sale and bying prices, then the associated parameters becomes variables of the scenarios $\xi^t$ = $\{\xi_k^t\}_{1\leq k \leq K}$, with K being the number of scenarios:\\
+$buy_j^t(\xi_k^t)$, $sell_j^t(\xi_k^t)$, $yield_j^t(\xi_k^t)$
+
+\subsection{Risk aversion}
+
+Plan for the worst-case, i.e. maximize the profit for the worst case due to risk aversion.\\
+
+\paragraph{a)}
+The worst situation corresponds to scenario 3 (below average yields), hence the agent applies the first-stage optimal solution of this scenario to all cases.
+i.e. surfaces in acres : (wheat, corn, sugar beets) = (100, 25, 375).
+
+
+
+
+
+
 
 \end{document}

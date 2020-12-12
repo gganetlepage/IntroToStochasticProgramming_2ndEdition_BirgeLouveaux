@@ -38,12 +38,35 @@ println("\nAverage situation\n","obj_value: ", obj_value,"\n x:", x, "\n w: ", w
 # y: [0.0, 0.0]
 
 #Let's apply these values of x to the 2 other possible scenarios:
-obj_value, w, y = model_with_first_stage_given([120, 80, 300], sell_mean, buy_mean, yield_mean *(1 - yield_var), plant) # 148_000.0
-println("\nOver average situation\n","obj_value: ", obj_value,"\n w: ", w, "\n y: ", y)
-obj_value, w, y = model_with_first_stage_given([120, 80, 300], sell_mean, buy_mean, yield_mean *(1 + yield_var), plant) # 55_120.0
-println("\nBelow average situation\n", "obj_value: ", obj_value,"\n w: ", w, "\n y: ", y)
-
-
+obj_value, w, y = model_with_first_stage_given([120, 80, 300], cattle, sell_mean, buy_mean, yield_mean *(1 - yield_var), quota, plant) # 148_000.0
+println("\nBelow average situation\n","obj_value: ", obj_value,"\n w: ", w, "\n y: ", y)
+#=
+below average situation
+obj_value: 55120.00000000001
+ w: [40.0, 0.0, 4800.0, 0.0]
+ y: [0.0, 47.99999999999997]
+=#
+obj_value, w, y = model_with_first_stage_given([120, 80, 300], cattle, sell_mean, buy_mean, yield_mean *(1 + yield_var), quota, plant) # 55_120.0
+println("\nOver average situation\n", "obj_value: ", obj_value,"\n w: ", w, "\n y: ", y)
+#=
+Over average situation
+obj_value: 148000.0
+ w: [160.0, 48.0, 6000.0, 1200.0]
+ y: [0.0, 0.0]
+=#
+println("multiple simultaneously")
+solve_multiple_models_with_first_stage_given([120,80,300],cattle, sell_mean, sell_var, buy_mean, buy_var, yield_mean, yield_var, quota, plant, false, false)
+#=
+OPTIMAL
+objective_value:55120.00000000001
+[40.0, 0.0, 4800.0, 0.0][0.0, 47.99999999999997]
+OPTIMAL
+objective_value:118600.0
+[100.0, 0.0, 6000.0, 0.0][0.0, 0.0]
+OPTIMAL
+objective_value:148000.0
+[160.0, 48.0, 6000.0, 1200.0][0.0, 0.0]
+=#
 
 values = [118600, 55120, 148000]
 println("\nUsing the average situation solution for every situations, results in average to a gain of : ",sum(values)/3) # 107240
@@ -109,7 +132,23 @@ wheat: 100.0
  beets: 375.0
  =#
  
-println("\n\n3. BINARY FIRST STAGE\n")
+println("\n\n7. RISK AVERSION\n")
 
+#obj_value, w, y = model_with_first_stage_given([100, 25, 375], sell_mean, buy_mean, yield_mean *(1 + yield_var), plant) # 55_120.0
+#println("\nBelow average situation\n", "obj_value: ", obj_value,"\n w: ", w, "\n y: ", y)
+optimal_1st_stage_decisions_worst_scenario = [100, 25, 375]
 
+solve_multiple_models_with_first_stage_given(optimal_1st_stage_decisions_worst_scenario, cattle, sell_mean, sell_var, buy_mean, buy_var, yield_mean, yield_var, quota, plant, false, true)
 
+#=
+OPTIMAL
+objective_value:59950.0
+[0.0, 0.0, 6000.0, 0.0][0.0, 180.0]
+OPTIMAL
+objective_value:86600.0
+[50.0, 0.0, 6000.0, 1500.0][0.0, 165.0]
+OPTIMAL
+objective_value:113250.0
+[100.0, 0.0, 6000.0, 3000.0][0.0, 150.0]
+(113250.0, [100.0, 0.0, 6000.0, 3000.0], [0.0, 150.0])
+=#

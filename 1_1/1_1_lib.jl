@@ -60,7 +60,7 @@ function solve_multiple_models(land, cattle, sell_mean, sell_var, buy_mean, buy_
     build_and_solve_model(land, cattle, sell_max, buy_max, yield_max, quota, plant, print_models, print_results)
 end
 
-function model_with_first_stage_given(x, sell, buy, yield, plant, print_model = false, print_result = false)
+function model_with_first_stage_given(x, cattle, sell, buy, yield, quota, plant, print_model = false, print_result = false)
     model = Model(with_optimizer(GLPK.Optimizer))
     function add_variables(model)
         @variables(model, begin
@@ -206,3 +206,5 @@ function binary_first_stage(fields, plants, land)
         #TODO add stage 2
     end
 =#
+
+print("")
