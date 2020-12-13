@@ -1,0 +1,64 @@
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage{comment}
+\usepackage{amsmath} % Advanced math typesetting
+\usepackage{amsfonts}
+\usepackage[utf8]{inputenc} % Unicode support (Umlauts etc.)
+\usepackage{hyperref} % Add a link to your document
+\usepackage[monochrome]{color} % Turning all of the colors stiched off
+
+\begin{document}
+\section{1}
+\subsection{Definition}
+
+\paragraph{Expected Profit}
+optimal value of the objective function when considering all scenarios with equal probility. This means, first-stage decisions sufficiently robust such that in average the objective value is maximum.
+e.g. the farm problem has an expected profit = 108,390
+
+\paragraph{EVPI: Expected Value of Perfect Information}
+Consider all possible scenarios, one knows in advance what scenario will happen on the following-stage. Hence, the best decisions will always be taken for all scenarios.
+Then, do the average gain over all scenarios.
+e.g. the farm problem has an EVPI = 115,406
+
+\paragraph{Expected Value Solution}
+Consider the mean situation, i.e. reducing all the uncertainty to one unique scenario, solving it optimally then applying the obtained decisions to each real scenario.
+e.g. the farm problem has an expected value solution = 107,240
+
+\paragraph{VSS: Value of the Stochastic Solution}
+VSS = Expected Profit - Expected Value Solution = the loss of not considering uncertainty
+
+\subsection{General Model Formulation}
+
+\paragraph{Model}
+\begin{align}
+	\text{min } & c^{T} x + \mathrm{E}_{\xi} \mathrm{Q}(x,\xi)
+\end{align}
+s.t.:
+\begin{align}
+Ax &= b\\
+x &\geq 0
+\end{align}
+where:
+\begin{equation}
+\mathrm{Q}(x,\xi) = \text{min } q^T y
+\end{equation}
+s.t.
+\begin{align}
+W y &= h - Tx\\
+y &\geq 0
+\end{align}
+
+
+with the recourse or value function $\mathcal{Q}$:
+\begin{equation}
+\mathcal{Q}(x) = \mathrm{E}_{\xi} \mathrm{Q}(x,\xi)
+\end{equation}
+meaning it is the expectancy over all scenarios in $\xi$ for a given decision $x$.\\
+\\
+Depending on the case, computation of $\mathrm{Q}(x,\xi)$ can be separated:\\
+\begin{equation}
+\mathcal{Q}(x) = \mathrm{E}_{\xi} \mathrm{Q}(x,\xi) = \sum\limits_{i=1}^{n} \mathrm{E}_i \mathrm{Q}_i(x_i,\xi) = \sum\limits_{i=1}^{n} \mathcal{Q}_i(x_i)
+\end{equation}
+
+\end{document}
