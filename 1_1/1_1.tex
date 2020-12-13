@@ -183,17 +183,26 @@ If there is uncertainty on the yield, sale and bying prices, then the associated
 $buy_j^t(\xi_k^t)$, $sell_j^t(\xi_k^t)$, $yield_j^t(\xi_k^t)$
 
 \subsection{Risk aversion}
-
+\setcounter{equation}{0}
 Plan for the worst-case, i.e. maximize the profit for the worst case due to risk aversion.\\
 
 \paragraph{a)}
 The worst situation corresponds to scenario 3 (below average yields), hence the agent applies the first-stage optimal solution of this scenario to all cases.
-i.e. surfaces in acres : (wheat, corn, sugar beets) = (100, 25, 375).
+i.e. surfaces in acres : (wheat, corn, sugar beets) = (100, 25, 375).\\
+The computation results in the following objective values, from the worst case to the best case:\\59950 86600 113250, i.e. the risk aversion expected profit = 86600 (see 1\_1.jl).\\
+To compare it with results from the optimal decisions of expected profit, i.e. decisions were (170, 80, 250):\\ 48820 109350 167000, i.e. the standard expected profit = 108390.\\
+One can notice the value obtained in the worst case is better in the risk averse case, however in the 2 other scenarios, values are significantly lower, resulting in an average worse value. The loss in expected profit with this solution: 21790\\
+
+\paragraph{b)}
+Add a constraint of a lower bound for the objective in the worst case, in the recourse function $\mathrm{Q}$ add:\\
+\begin{equation}
+\sum\limits_{j=1}^{|P|-1} buy_j(\xi) \cdot y_j - \sum\limits_{j=1}^{|P|+1} sell_j(\xi) \cdot w_j \leq - LowerBound - \sum\limits_{j=1}^{|P|} plant_j \cdot x_j 
+\end{equation}
+The equation is like this because sell - buy - plant = profit, hence buy + plant - sell = - profit, as we want profit $\geq$ LowerBound $\iff$- profit $\leq$ - LowerBound
+
+\paragraph{c)}
 
 
-
-
-
-
+\subsection{Data fluctuations}
 
 \end{document}

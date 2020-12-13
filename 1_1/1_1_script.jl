@@ -25,6 +25,8 @@ objective_value:167666.6666666667
 [183.33333333333331, 66.66666666666667, 250.0][350.0, 0.0, 6000.0, 0.0][0.0, 0.0]
 =#
 
+println("EVPI:")
+println(sum([59950, 118600, 167666]) / 3) # 115405.33333333333
 
 println("Exercices:")
 
@@ -116,6 +118,7 @@ sp = instantiate(quickstart_model, [ξ₁,ξ₂], optimizer = GLPK.Optimizer)
 #println(optimal_decision(sp))
 
 #farm problem
+println("stochastic farm problem")
 yield_min, yield_mean, yield_max = rangeValues(yield_mean, yield_var)
 #println("min: ", yield_min,"mean: ", yield_mean,"max: ", yield_max)
 ξ₁ = Scenario( wheat = yield_min[1], corn = yield_min[2], beets = yield_min[3], probability = 1/3)
@@ -125,11 +128,13 @@ farmInstance = instantiate(farm_stochastic_model, [ξ₁,ξ₂,ξ₃], optimizer
 
 #print(farmInstance)
 optimize!(farmInstance)
-println("wheat: $(x[1])\n corn: $(x[2])\n beets: $(x[3])\n")
+decisionsStochastic = optimal_decision(farmInstance)
+println("wheat: $(decisionsStochastic[1])\n corn: $(decisionsStochastic[2])\n beets: $(decisionsStochastic[3])\n Profit: $(objective_value(farmInstance))")
 #=
-wheat: 100.0
- corn: 24.999999999999986
- beets: 375.0
+wheat: 170.00000000000006
+ corn: 80.00000000000001
+ beets: 250.0
+ Profit: -108390.00000000001
  =#
  
 println("\n\n7. RISK AVERSION\n")
@@ -150,5 +155,24 @@ objective_value:86600.0
 OPTIMAL
 objective_value:113250.0
 [100.0, 0.0, 6000.0, 3000.0][0.0, 150.0]
-(113250.0, [100.0, 0.0, 6000.0, 3000.0], [0.0, 150.0])
 =#
+risk_averse_expected_profit = (59950.0 + 86600 + 113250)/3 #86600
+
+
+println("\nstandard expected profit")
+standard_expected_profit_1st_stage_decisions = [170,80,250]
+solve_multiple_models_with_first_stage_given(standard_expected_profit_1st_stage_decisions, cattle, sell_mean, sell_var, buy_mean, buy_var, yield_mean, yield_var, quota, plant, false, true)
+
+#=
+objective_value:48820.00000000001
+[140.0, 0.0, 4000.0, 0.0][0.0, 47.99999999999997]
+OPTIMAL
+objective_value:109350.0
+[225.0, 0.0, 5000.0, 0.0][0.0, 0.0]
+OPTIMAL
+objective_value:167000.0
+[310.0, 48.0, 6000.0, 0.0][0.0, 0.0]
+=#
+expected_value = (48820 + 109350 + 167000)/3 #108390
+
+println(" loss in expected profit:", expected_value - risk_averse_expected_profit)
